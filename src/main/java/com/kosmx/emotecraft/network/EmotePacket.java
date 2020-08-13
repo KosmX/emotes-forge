@@ -11,6 +11,8 @@ public class EmotePacket{
     protected Emote emote;
     protected UUID player;
     protected boolean correct = true;
+    private int version = 2;
+    public boolean isRepeat = false;
 
     public EmotePacket(Emote emote, PlayerEntity playerEntity){
         this.emote = emote;
@@ -18,7 +20,9 @@ public class EmotePacket{
     }
     public EmotePacket(){}
 
-    public boolean read(PacketByteBuf buf){
+    public boolean read(PacketByteBuf buf, boolean validate){
+        this.version = buf.readInt();
+        this.isRepeat = buf.readBoolean();
         player = buf.readUuid();    //we need to know WHO playings this emote
         emote = new Emote(buf.readInt(), buf.readInt(), buf.readInt(), buf.readBoolean(), buf.readInt());
         getBodyPartInfo(buf, emote.head);
@@ -27,7 +31,7 @@ public class EmotePacket{
         getBodyPartInfo(buf, emote.leftArm);
         getBodyPartInfo(buf, emote.rightLeg);
         getBodyPartInfo(buf, emote.leftLeg);
-        return correct;
+        return !(!correct && validate) && emote.getBeginTick() >= 0 && emote.getBeginTick() < emote.getEndTick() && (!emote.isInfinite() || emote.getReturnTick() < emote.getEndTick() && emote.getReturnTick() >= 0);
     }
     public UUID getPlayer(){
         return this.player;
@@ -37,6 +41,8 @@ public class EmotePacket{
     }
 
     public void write(PacketByteBuf buf) {
+        buf.writeInt(version);
+        buf.writeBoolean(isRepeat);
         buf.writeUuid(player);
         buf.writeInt(emote.getBeginTick());
         buf.writeInt(emote.getEndTick());

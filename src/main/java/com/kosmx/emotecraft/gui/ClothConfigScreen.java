@@ -1,4 +1,4 @@
-package com.kosmx.emotecraft.screen;
+package com.kosmx.emotecraft.gui;
 
 import com.kosmx.emotecraft.Main;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -30,11 +30,15 @@ public class ClothConfigScreen {
         general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("emotecraft.otherconfig.quark"), Main.config.enableQuark)
                                  .setDefaultValue(false)
                                  .setSaveConsumer(newValue -> {
-                                     if(newValue && parent instanceof EmoteMenu){
+                                     if(newValue && parent instanceof EmoteMenu && !Main.config.enableQuark){
                                          ((EmoteMenu)parent).warn = true;
                                      }
                                      Main.config.enableQuark = newValue;
                                  }).build());
+        general.addEntry(entryBuilder.startBooleanToggle(new TranslatableText("emotecraft.otherconfig.showicon"), Main.config.showIcons)
+                                 .setDefaultValue(true)
+                                 .setTooltip(new TranslatableText("emotecraft.otherconfig.showicon.tooltip"))
+                                 .setSaveConsumer(newValue -> Main.config.showIcons = newValue).build());
         return builder.build();
     }
 }

@@ -4,9 +4,9 @@ import com.kosmx.emotecraft.math.Ease;
 import com.kosmx.emotecraft.math.Easing;
 import com.kosmx.emotecraft.math.Helper;
 import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.vector.Vector3f;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
@@ -77,8 +77,7 @@ public class Emote {
         return stopTick;
     }
 
-
-    private float getCurrentTick(){
+    public float getCurrentTick(){
         return this.currentTick + this.tickDelta;
     }
 
@@ -89,7 +88,7 @@ public class Emote {
             currentTick = returnTick;
             isInfStarted = true;
         }
-        if (currentTick > stopTick){
+        if (currentTick >= stopTick){
             this.isRunning = false;
         }
     }
@@ -103,7 +102,7 @@ public class Emote {
         this.isRunning = true;
         if (beginTick < 0)beginTick = 0;
         if (endTick < beginTick) endTick = beginTick;
-        if (stopTick <= endTick) stopTick = endTick + 1;
+        if (stopTick <= endTick) stopTick = endTick + 3;
     }
 
     public void stop(){

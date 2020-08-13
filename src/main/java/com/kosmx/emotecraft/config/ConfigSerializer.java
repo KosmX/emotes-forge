@@ -2,10 +2,10 @@ package com.kosmx.emotecraft.config;
 
 import com.google.gson.*;
 import com.kosmx.emotecraft.Main;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Pair;
+import net.minecraft.util.Tuple;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.lang.reflect.Type;
 
@@ -16,19 +16,20 @@ public class ConfigSerializer implements JsonDeserializer<SerializableConfig>, J
         JsonObject node = json.getAsJsonObject();
         SerializableConfig config = new SerializableConfig();
         if(node.has("showDebug"))config.showDebug = node.get("showDebug").getAsBoolean();
-        if(node.has("validate"))config.showDebug = node.get("validate").getAsBoolean();
+        if(node.has("validate"))config.validateEmote = node.get("validate").getAsBoolean();
         if(node.has("enablequark"))config.enableQuark = node.get("enablequark").getAsBoolean();
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT)clientDeserialize(node, config);
+        if(FMLEnvironment.dist == Dist.CLIENT)clientDeserialize(node, config);
         return config;
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private void clientDeserialize(JsonObject node, SerializableConfig config){
         if(node.has("dark"))config.dark = node.get("dark").getAsBoolean();
+        if(node.has("showIcon"))config.showIcons = node.get("showIcon").getAsBoolean();
         if(node.has("fastmenu"))fastMenuDeserializer(node.get("fastmenu").getAsJsonObject(), config);
         if(node.has("keys"))keyBindsDeserializer(node.get("keys").getAsJsonArray(), config);
     }
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private void fastMenuDeserializer(JsonObject node, SerializableConfig config){
         for(int i = 0;i != 8; i++){
             if(node.has(Integer.toString(i))){
@@ -44,16 +45,16 @@ public class ConfigSerializer implements JsonDeserializer<SerializableConfig>, J
             }
         }
     }
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private void keyBindsDeserializer(JsonArray node, SerializableConfig config){
         for(JsonElement object:node){
             JsonObject n = object.getAsJsonObject();
-            config.emotesWithHash.add(new Pair<>(n.get("id").getAsInt(), n.get("key").getAsString()));
+            config.emotesWithHash.add(new Tuple<>(n.get("id").getAsInt(), n.get("key").getAsString()));
             //keyBindDeserializer(object.getAsJsonObject());
         }
     }
     /*
-    @Environment(EnvType.CLIENT)
+    @Environment(Dist.CLIENT)
     private void keyBindDeserializer(JsonObject node){
 
         EmoteHolder emote = EmoteHolder.getEmoteFromHash(node.get("id").getAsInt());
@@ -71,19 +72,20 @@ public class ConfigSerializer implements JsonDeserializer<SerializableConfig>, J
     public JsonElement serialize(SerializableConfig config, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject node = new JsonObject();
         node.addProperty("showDebug", config.showDebug);
-        node.addProperty("validate", config.showDebug);
-        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) clientSerialize(config, node);
+        node.addProperty("validate", config.validateEmote);
+        if(FMLEnvironment.dist == Dist.CLIENT) clientSerialize(config, node);
         return node;
     }
 
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private void clientSerialize(SerializableConfig config, JsonObject node){
         node.addProperty("dark", config.dark);
         if(Main.config.enableQuark)node.addProperty("enablequark", true);
+        node.addProperty("showIcon", config.showIcons);
         node.add("fastmenu", fastMenuSerializer(config));
         node.add("keys", keyBindsSerializer(config));
     }
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private JsonObject fastMenuSerializer(SerializableConfig config){
         JsonObject node = new JsonObject();
         for (int i = 0; i != 8; i++){
@@ -93,7 +95,7 @@ public class ConfigSerializer implements JsonDeserializer<SerializableConfig>, J
         }
         return node;
     }
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private JsonArray keyBindsSerializer(SerializableConfig config){
         JsonArray array = new JsonArray();
         for(EmoteHolder emote:config.emotesWithKey){
@@ -101,7 +103,7 @@ public class ConfigSerializer implements JsonDeserializer<SerializableConfig>, J
         }
         return array;
     }
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private JsonObject keyBindSerializer(EmoteHolder emote){
         JsonObject node = new JsonObject();
         node.addProperty("id", emote.hash);

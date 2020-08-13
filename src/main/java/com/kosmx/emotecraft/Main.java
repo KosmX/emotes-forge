@@ -40,13 +40,66 @@ public class Main implements ModInitializer {
     public static final Identifier EMOTE_PLAY_NETWORK_PACKET_ID = new Identifier(MOD_ID, "playemote");
     public static final Identifier EMOTE_STOP_NETWORK_PACKET_ID = new Identifier(MOD_ID, "stopemote");
 
+    /**
+     * This initializer runs on the server and on the client.
+     * Load config, init networking
+     * And Main has the static variables of the mod.
+     */
     @Override
     public void onInitialize() {
+
         Serializer.initializeSerializer();/*
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT){ //I can't do it in the client initializer because I need it to serialize the config
             Client.initEmotes();
         }
         */
+
+        loadConfig();
+
+        log(Level.INFO, "Initializing");
+
+        initServerNetwork(); //Network handler both dedicated server and client internal server
+    }
+
+    public static void log(Level level, String message){
+        log(level, message, false);
+    }
+
+    public static void log(Level level, String message, boolean force){
+        if (force || (config != null && config.showDebug)) LOGGER.log(level, "["+MOD_NAME+"] " + message);
+    }
+
+    private void initServerNetwork(){
+        ServerSidePacketRegistry.INSTANCE.register(EMOTE_PLAY_NETWORK_PACKET_ID, ((packetContext, packetByteBuf) -> {EmotePacket packet = new EmotePacket();
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+            if(!packet.read(packetByteBuf, config.validateEmote)) {
+                //Todo kick player
+                Main.log(Level.INFO, packetContext.getPlayer().getEntityName() + " is trying to play invalid emote", true);
+                return;
+            }
+                packet.write(buf);
+            Stream<PlayerEntity> players = PlayerStream.watching(packetContext.getPlayer());
+            players.forEach(playerEntity -> {                                   //TODO check correct emote and kick if not
+                if (playerEntity == packetContext.getPlayer()) return;
+                ServerSidePacketRegistry.INSTANCE.sendToPlayer(playerEntity, EMOTE_PLAY_NETWORK_PACKET_ID, buf);
+            });
+        }));
+
+        ServerSidePacketRegistry.INSTANCE.register(EMOTE_STOP_NETWORK_PACKET_ID, ((packetContex, packetByteBuf) -> {
+            StopPacket packet = new StopPacket();
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+            packet.read(packetByteBuf);
+            packet.write(buf);
+
+            Stream<PlayerEntity> players = PlayerStream.watching(packetContex.getPlayer());
+            players.forEach(player -> {
+                if(player == packetContex.getPlayer())return;
+                ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, EMOTE_STOP_NETWORK_PACKET_ID, buf);
+            });
+        }));
+    }
+
+    private static void loadConfig(){
         if(CONFIGPATH.toFile().isFile()){
             try {
                 BufferedReader reader = Files.newBufferedReader(CONFIGPATH);
@@ -71,47 +124,6 @@ public class Main implements ModInitializer {
             config = new SerializableConfig();
         }
 
-        log(Level.INFO, "Initializing");
-
-        initServerNetwork(); //Network handler both dedicated server and client internal server
-    }
-
-    public static void log(Level level, String message){
-        log(level, message, false);
-    }
-
-    public static void log(Level level, String message, boolean force){
-        if (force || (config != null && config.showDebug)) LOGGER.log(level, "["+MOD_NAME+"] " + message);
-    }
-
-    private void initServerNetwork(){
-        ServerSidePacketRegistry.INSTANCE.register(EMOTE_PLAY_NETWORK_PACKET_ID, ((packetContext, packetByteBuf) -> {EmotePacket packet = new EmotePacket();
-            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-            if(!packet.read(packetByteBuf) && config.validateEmote) {
-                //Todo kick player
-                Main.log(Level.INFO, packetContext.getPlayer().getEntityName() + " is trying to play invalid emote");
-                return;
-            }
-                packet.write(buf);
-            Stream<PlayerEntity> players = PlayerStream.watching(packetContext.getPlayer());
-            players.forEach(playerEntity -> {                                   //TODO check correct emote and kick if not
-                if (playerEntity == packetContext.getPlayer()) return;
-                ServerSidePacketRegistry.INSTANCE.sendToPlayer(playerEntity, EMOTE_PLAY_NETWORK_PACKET_ID, buf);
-            });
-        }));
-
-        ServerSidePacketRegistry.INSTANCE.register(EMOTE_STOP_NETWORK_PACKET_ID, ((packetContex, packetByteBuf) -> {
-            StopPacket packet = new StopPacket();
-            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-            packet.read(packetByteBuf);
-            packet.write(buf);
-
-            Stream<PlayerEntity> players = PlayerStream.watching(packetContex.getPlayer());
-            players.forEach(player -> {
-                if(player == packetContex.getPlayer())return;
-                ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, EMOTE_STOP_NETWORK_PACKET_ID, buf);
-            });
-        }));
     }
 
 
