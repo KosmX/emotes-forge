@@ -8,11 +8,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.text.TextComponent;
 
 public class FastMenuScreen extends Screen {
     private FastMenuWidget widget;
 
-    public FastMenuScreen(Text title) {
+    public FastMenuScreen(TextComponent title) {
         super(title);
     }
 

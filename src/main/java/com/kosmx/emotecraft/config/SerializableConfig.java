@@ -1,32 +1,32 @@
 package com.kosmx.emotecraft.config;
 
 import com.kosmx.emotecraft.Main;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Pair;
+import net.minecraft.client.util.InputMappings;
+import net.minecraft.util.Tuple;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Level;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SerializableConfig {
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public List<EmoteHolder> emotesWithKey = new ArrayList<>();
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public final EmoteHolder[] fastMenuEmotes = new EmoteHolder[8];
 
     public boolean validateEmote = false;
     public boolean showDebug = false;
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public boolean dark = false;
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public boolean enableQuark = false;
-    @Environment(EnvType.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public boolean showIcons = true;
 
     public int[] fastMenuHash = new int[8];
-    public List<Pair<Integer, String>> emotesWithHash = new ArrayList<>();
+    public List<Tuple<Integer, String>> emotesWithHash = new ArrayList<>();
 
     public void assignEmotes(){
         this.emotesWithKey = new ArrayList<>();
@@ -39,13 +39,13 @@ public class SerializableConfig {
             }
         }
 
-        for (Pair<Integer, String> pair : emotesWithHash){
-            EmoteHolder emote = EmoteHolder.getEmoteFromHash(pair.getLeft());
+        for (Tuple<Integer, String> pair : emotesWithHash){
+            EmoteHolder emote = EmoteHolder.getEmoteFromHash(pair.getA());
             if (emote != null){
-                emote.keyBinding = InputUtil.fromTranslationKey(pair.getRight());
+                emote.keyBinding = InputMappings.getInputByName(pair.getB());
             }
             else {
-                Main.log(Level.ERROR, "Can't find emote from hash: " + pair.getLeft());
+                Main.log(Level.ERROR, "Can't find emote from hash: " + pair.getA());
             }
         }
 

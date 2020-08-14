@@ -3,8 +3,9 @@ package com.kosmx.emotecraft.config;
 import com.google.gson.*;
 import com.kosmx.emotecraft.Emote;
 import com.kosmx.emotecraft.Main;
-import net.minecraft.text.*;
 import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import org.apache.logging.log4j.Level;
 
 import java.lang.reflect.Type;
@@ -16,14 +17,14 @@ public class EmoteSerializer implements JsonDeserializer<EmoteHolder> {
     @Override
     public EmoteHolder deserialize(JsonElement p, Type typeOf, JsonDeserializationContext ctxt) throws JsonParseException {
         JsonObject node = p.getAsJsonObject();
-        IFormattableTextComponent author = (IFormattableTextComponent) LiteralText.EMPTY;
-        IFormattableTextComponent name = Text.Serializer.fromJson(node.get("name"));
+        IFormattableTextComponent author = (IFormattableTextComponent) StringTextComponent.field_240750_d_;
+        IFormattableTextComponent name = ITextComponent.Serializer.func_240641_a_(node.get("name")); //Tiny (fabric) equivalent: Text.Serializer.fromJson
         if(node.has("author")){
-            author = Text.Serializer.fromJson(node.get("author"));
+            author = ITextComponent.Serializer.func_240641_a_(node.get("author"));
         }
-        IFormattableTextComponent description = (IFormattableTextComponent) LiteralText.EMPTY;
+        IFormattableTextComponent description = (IFormattableTextComponent) StringTextComponent.field_240750_d_;
         if(node.has("description")){
-            description = (IFormattableTextComponent) Text.Serializer.fromJson(node.get("description"));
+            description = (IFormattableTextComponent) ITextComponent.Serializer.func_240641_a_(node.get("description"));
         }
         node.entrySet().forEach((entry)->{
             String string = entry.getKey();

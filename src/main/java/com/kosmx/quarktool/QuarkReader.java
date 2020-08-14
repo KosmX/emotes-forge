@@ -3,10 +3,10 @@ package com.kosmx.quarktool;
 import com.kosmx.emotecraft.Emote;
 import com.kosmx.emotecraft.Main;
 import com.kosmx.emotecraft.config.EmoteHolder;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Level;
 
 import java.io.BufferedReader;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class QuarkReader {
     private final Emote emote = new Emote(0);
     private boolean isSuccess = false;
@@ -68,7 +68,7 @@ public class QuarkReader {
 
     public EmoteHolder getEmote(){
         if(isSuccess){
-            return new EmoteHolder(this.emote, new LiteralText(this.name).formatted(Formatting.WHITE), new LiteralText("Imported from quark").formatted(Formatting.GRAY), new LiteralText("").formatted(Formatting.GRAY), this.hash);
+            return new EmoteHolder(this.emote, new StringTextComponent(this.name).func_240699_a_(TextFormatting.WHITE), new StringTextComponent("Imported from quark").func_240699_a_(TextFormatting.GRAY), new StringTextComponent("").func_240699_a_(TextFormatting.GRAY), this.hash);
         }
         else return null;
     }
@@ -80,7 +80,7 @@ public class QuarkReader {
         }
         s = new StringBuffer(s).replace(0, i, "").toString();
         List<String> list = new ArrayList<>(Arrays.asList(s.split(" ")));
-        list.removeIf(s1 -> {return s1.equals("");});
+        list.removeIf(s1 -> s1.equals(""));
         return list;
     }
 

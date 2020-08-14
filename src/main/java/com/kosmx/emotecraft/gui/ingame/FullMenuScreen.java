@@ -24,7 +24,7 @@ public class FullMenuScreen extends Screen {
     }
 
     @Override
-    public void init() {
+    public void func_231160_c_() {
         int x = (int) Math.min(this.width*0.8, this.height - 120);
         this.searchBox = new TextFieldWidget(this.textRenderer, (this.width - x)/2, 12, x, 20, this.searchBox, new TranslatableText("emotecraft.search"));
         this.searchBox.setChangedListener((string)-> this.emoteList.filter(string::toLowerCase));
