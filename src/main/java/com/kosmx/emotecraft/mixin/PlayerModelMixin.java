@@ -3,16 +3,16 @@ package com.kosmx.emotecraft.mixin;
 
 import com.kosmx.emotecraft.Emote;
 import com.kosmx.emotecraft.playerInterface.EmotePlayerInterface;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.client.render.entity.model.PlayerEntityModel;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(PlayerEntityModel.class)
-public class PlayerModelMixin<T extends LivingEntity> extends BipedEntityModel<T> {
+@Mixin(PlayerModel.class)
+public class PlayerModelMixin<T extends LivingEntity> extends BipedModel<T> {
 
 
     public PlayerModelMixin(float scale) {
@@ -20,37 +20,37 @@ public class PlayerModelMixin<T extends LivingEntity> extends BipedEntityModel<T
     }
 
     private void setDefaultPivot(){
-        this.leftLeg.setPivot(1.9F, 12.0F, 0.0F);
-        this.rightLeg.setPivot(-1.9F, 12.0F, 0.0F);
-        this.head.setPivot(0.0F, 0.0F, 0.0F);
-        this.rightArm.pivotZ = 0.0F;
-        this.rightArm.pivotX = -5.0F;
-        this.leftArm.pivotZ = 0.0F;
-        this.leftArm.pivotX = 5.0F;
-        this.torso.pitch = 0.0F;
-        this.rightLeg.pivotZ = 0.1F;
-        this.leftLeg.pivotZ = 0.1F;
-        this.rightLeg.pivotY = 12.0F;
-        this.leftLeg.pivotY = 12.0F;
-        this.head.pivotY = 0.0F;
-        this.head.roll = 0f;
-        this.torso.pivotY = 0.0F;
+        this.bipedLeftLeg.setRotationPoint(1.9F, 12.0F, 0.0F);
+        this.bipedRightLeg.setRotationPoint(-1.9F, 12.0F, 0.0F);
+        this.bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
+        this.bipedRightArm.rotationPointZ = 0.0F;
+        this.bipedRightArm.rotationPointX = -5.0F;
+        this.bipedLeftArm.rotationPointZ = 0.0F;
+        this.bipedLeftArm.rotationPointX = 5.0F;
+        this.bipedBody.rotateAngleX = 0.0F;
+        this.bipedRightLeg.rotationPointZ = 0.1F;
+        this.bipedLeftLeg.rotationPointZ = 0.1F;
+        this.bipedRightLeg.rotationPointY = 12.0F;
+        this.bipedLeftLeg.rotationPointY = 12.0F;
+        this.bipedHead.rotationPointY = 0.0F;
+        this.bipedHead.rotateAngleZ = 0f;
+        this.bipedBody.rotationPointY = 0.0F;
     }
 
-    @Redirect(method = "setAngles", at = @At(
+    @Redirect(method = "setRotationAngles", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/render/entity/model/BipedEntityModel;setAngles(Lnet/minecraft/entity/LivingEntity;FFFFF)V"))
-    private void setEmote(BipedEntityModel<?> idk,T livingEntity, float f, float g, float h, float i, float j){
+            target = "Lnet/minecraft/client/renderer/entity/model/BipedModel;setRotationAngles(Lnet/minecraft/entity/LivingEntity;FFFFF)V"))
+    private void setEmote(BipedModel<?> idk,T livingEntity, float f, float g, float h, float i, float j){
         setDefaultPivot();  //to not make everything wrong
-        super.setAngles(livingEntity, f, g, h, i, j);
+        super.setRotationAngles(livingEntity, f, g, h, i, j);
         if(livingEntity instanceof AbstractClientPlayerEntity && Emote.isRunningEmote(((EmotePlayerInterface)livingEntity).getEmote())){
             Emote emote = ((EmotePlayerInterface) livingEntity).getEmote();
-            emote.head.setBodyPart(this.head);
-            this.helmet.copyPositionAndRotation(this.head);
-            emote.leftArm.setBodyPart(this.leftArm);
-            emote.rightArm.setBodyPart(this.rightArm);
-            emote.leftLeg.setBodyPart(this.leftLeg);
-            emote.rightLeg.setBodyPart(this.rightLeg);
+            emote.head.setBodyPart(this.bipedHead);
+            this.bipedHeadwear.copyModelAngles(this.bipedHeadwear);
+            emote.leftArm.setBodyPart(this.bipedLeftArm);
+            emote.rightArm.setBodyPart(this.bipedRightArm);
+            emote.leftLeg.setBodyPart(this.bipedLeftLeg);
+            emote.rightLeg.setBodyPart(this.bipedRightLeg);
         }
     }
 }

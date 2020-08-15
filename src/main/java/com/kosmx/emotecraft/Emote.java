@@ -3,10 +3,10 @@ package com.kosmx.emotecraft;
 import com.kosmx.emotecraft.math.Ease;
 import com.kosmx.emotecraft.math.Easing;
 import com.kosmx.emotecraft.math.Helper;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
@@ -145,13 +145,13 @@ public class Emote {
         }
 
 
-        public void setBodyPart(ModelPart modelPart){
-            modelPart.pivotX = x.getCurrentValue(modelPart.pivotX, tickDelta);
-            modelPart.pivotY = y.getCurrentValue(modelPart.pivotY, tickDelta);
-            modelPart.pivotZ = z.getCurrentValue(modelPart.pivotZ, tickDelta);
-            modelPart.pitch = pitch.getCurrentValue(modelPart.pitch, tickDelta);
-            modelPart.yaw = yaw.getCurrentValue(modelPart.yaw, tickDelta);
-            modelPart.roll = roll.getCurrentValue(modelPart.roll, tickDelta);
+        public void setBodyPart(ModelRenderer modelPart){
+            modelPart.rotationPointX = x.getCurrentValue(modelPart.rotationPointX, tickDelta);
+            modelPart.rotationPointY = y.getCurrentValue(modelPart.rotationPointY, tickDelta);
+            modelPart.rotationPointZ = z.getCurrentValue(modelPart.rotationPointZ, tickDelta);
+            modelPart.rotateAngleX = pitch.getCurrentValue(modelPart.rotateAngleX, tickDelta);
+            modelPart.rotateAngleY = yaw.getCurrentValue(modelPart.rotateAngleY, tickDelta);
+            modelPart.rotateAngleZ = roll.getCurrentValue(modelPart.rotateAngleZ, tickDelta);
         }
     }
     public class Torso extends BodyPart {
@@ -159,11 +159,11 @@ public class Emote {
             super(x, y, z, yaw, pitch, roll);
         }
 
-        public Vec3d getBodyOffshet(){
+        public Vector3d getBodyOffshet(){
             float x = this.x.getCurrentValue(0, tickDelta);
             float y = this.y.getCurrentValue(0, tickDelta);
             float z = this.z.getCurrentValue(0, tickDelta);
-            return new Vec3d(x, y, z);
+            return new Vector3d(x, y, z);
         }
         public Vector3f getBodyRotation(){
             float x = this.pitch.getCurrentValue(0, tickDelta);

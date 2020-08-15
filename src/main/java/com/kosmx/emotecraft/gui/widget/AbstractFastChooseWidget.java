@@ -3,20 +3,20 @@ package com.kosmx.emotecraft.gui.widget;
 import com.kosmx.emotecraft.Main;
 import com.kosmx.emotecraft.config.EmoteHolder;
 import com.kosmx.emotecraft.math.Helper;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.IRenderable;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
 
-public abstract class AbstractFastChooseWidget extends DrawableHelper implements Drawable, Element {
+public abstract class AbstractFastChooseWidget extends AbstractGui implements IRenderable, IGuiEventListener {
 
 
     public int x;
@@ -24,7 +24,7 @@ public abstract class AbstractFastChooseWidget extends DrawableHelper implements
     protected int size;
     protected final FastChooseElement[] elements = new FastChooseElement[8];
     private boolean hovered;
-    private final Identifier TEXTURE = Main.config.dark ? new Identifier(Main.MOD_ID, "textures/gui/fastchoose_dark.png") : new Identifier(Main.MOD_ID, "textures/gui/fastchoose_light.png");
+    private final ResourceLocation TEXTURE = Main.config.dark ? new ResourceLocation(Main.MOD_ID, "textures/gui/fastchoose_dark.png") : new ResourceLocation(Main.MOD_ID, "textures/gui/fastchoose_light.png");
 
     private AbstractFastChooseWidget(){
         elements[0] = new FastChooseElement(0, 22.5f);
@@ -44,13 +44,13 @@ public abstract class AbstractFastChooseWidget extends DrawableHelper implements
         this.size = size;       //It's a square with same width and height
     }
 
-    public void drawCenteredText(MatrixStack matrixStack, TextRenderer textRenderer, Text stringRenderable, float deg){
+    public void drawCenteredText(MatrixStack matrixStack, FontRenderer textRenderer, ITextComponent stringRenderable, float deg){
         drawCenteredText(matrixStack, textRenderer, stringRenderable, (float) (((float)(this.x + this.size/2)) + size*0.4*Math.sin(deg * 0.0174533)), (float) (((float)(this.y + this.size/2)) + size*0.4*Math.cos(deg * 0.0174533)));
     }
 
-    public static void drawCenteredText(MatrixStack matrices, TextRenderer textRenderer, Text stringRenderable, float x, float y){
+    public static void drawCenteredText(MatrixStack matrices, FontRenderer textRenderer, ITextComponent stringRenderable, float x, float y){
         int c = Main.config.dark ? 255 : 0; //:D
-        textRenderer.draw(matrices, stringRenderable, x - (float)textRenderer.getWidth(stringRenderable) / 2, y - 2, Helper.colorHelper(c, c, c, 1));
+        textRenderer.func_243248_b(matrices, stringRenderable, x - (float)textRenderer.func_238414_a_(stringRenderable) / 2, y - 2, Helper.colorHelper(c, c, c, 1));
     }
 
     @Nullable
@@ -82,10 +82,10 @@ public abstract class AbstractFastChooseWidget extends DrawableHelper implements
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         checkHovered(mouseX, mouseY);
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        TextRenderer textRenderer = minecraftClient.textRenderer;
+        Minecraft minecraftClient = Minecraft.getInstance();
+        FontRenderer textRenderer = minecraftClient.fontRenderer;
         minecraftClient.getTextureManager().bindTexture(TEXTURE);
         RenderSystem.color4f(1, 1, 1, 1);
         RenderSystem.enableBlend();
@@ -114,7 +114,7 @@ public abstract class AbstractFastChooseWidget extends DrawableHelper implements
      * @param s used texture part size !NOT THE WHOLE TEXTURE IMAGE SIZE!
      */
     private void drawTexture(MatrixStack matrices, int x, int y, int u, int v, int s){
-        drawTexture(matrices, this.x + x*this.size/256, this.y + y*this.size/256, s * this.size/2, s*this.size/2, u, v, s*128, s*128, 512, 512);
+        func_238466_a_(matrices, this.x + x*this.size/256, this.y + y*this.size/256, s * this.size/2, s*this.size/2, u, v, s*128, s*128, 512, 512);
     }
 
     private void checkHovered(int mouseX, int mouseY){
@@ -122,7 +122,7 @@ public abstract class AbstractFastChooseWidget extends DrawableHelper implements
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean func_231044_a_(double mouseX, double mouseY, int button) {
         checkHovered((int)mouseX, (int)mouseY);
         if(this.hovered && this.isValidClickButton(button)){
             FastChooseElement element = this.getActivePart((int)mouseX, (int)mouseY);
@@ -134,7 +134,7 @@ public abstract class AbstractFastChooseWidget extends DrawableHelper implements
     }
 
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
+    public boolean func_231047_b_(double mouseX, double mouseY) {
         this.checkHovered((int)mouseX, (int)mouseY);
         return this.hovered;
     }
@@ -169,14 +169,14 @@ public abstract class AbstractFastChooseWidget extends DrawableHelper implements
             this.setEmote(null);
         }
 
-        public void render(MatrixStack matrices, TextRenderer textRenderer) {
-            Identifier identifier = Main.config.fastMenuEmotes[id] != null ? Main.config.fastMenuEmotes[id].getIcon() : null;
+        public void render(MatrixStack matrices, FontRenderer textRenderer) {
+            ResourceLocation identifier = Main.config.fastMenuEmotes[id] != null ? Main.config.fastMenuEmotes[id].getIcon() : null;
             if(identifier != null && Main.config.showIcons){
                 int s = size / 10;
                 int iconX = (int) (((float)(x + size/2)) + size*0.4*Math.sin(this.angle * 0.0174533)) - s;
                 int iconY = (int) (((float)(y + size/2)) + size*0.4*Math.cos(this.angle * 0.0174533)) - s;
-                MinecraftClient.getInstance().getTextureManager().bindTexture(identifier);
-                drawTexture(matrices, iconX, iconY, s*2, s*2, 0, 0, 256, 256, 256, 256);
+                Minecraft.getInstance().getTextureManager().bindTexture(identifier);
+                func_238466_a_(matrices, iconX, iconY, s*2, s*2, 0, 0, 256, 256, 256, 256);
             }
             else {
                 if (Main.config.fastMenuEmotes[id] != null) {

@@ -1,4 +1,4 @@
-package com.kosmx.emotecraft;
+/*package com.kosmx.emotecraft;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -14,7 +14,7 @@ public interface KeyPressCallback {
      * CONSUME - stop the listener, we don't have to check, but not success
      * PASS - Continue searching, somewhy don't play idk...(not that key was set)
      * FAIL --> ERROR
-     */
+     /
     Event<KeyPressCallback> EVENT = EventFactory.createArrayBacked(KeyPressCallback.class,
             (listeners) -> (key) -> {
                 for(KeyPressCallback listener :listeners){
@@ -33,3 +33,4 @@ public interface KeyPressCallback {
 
     ActionResult onKeyPress(InputUtil.Key key);
 }
+*/

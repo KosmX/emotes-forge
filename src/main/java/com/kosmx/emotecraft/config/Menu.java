@@ -1,3 +1,3 @@
 package com.kosmx.emotecraft.config;
 
-//TODO Forge menu redirecting
+//Forge menu redirecting is in the ForgeLoader

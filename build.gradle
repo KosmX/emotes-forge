@@ -111,6 +111,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
 
+    //Mod dependencies
+    compile files("cloth-config-forge-4.1.0.jar")
 
 }
 

@@ -17,11 +17,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.util.InputMappings;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslationTextComponent();
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -78,7 +73,7 @@ public class EmoteMenu extends Screen {
         this.field_230710_m_.add(new Button(this.field_230708_k_ / 2 - 154, this.field_230709_l_ - 30, 150, 20, new TranslationTextComponent("emotecraft.openFolder"), (buttonWidget) -> Util.getOSType().openFile(Client.externalEmotes)));
 
         this.emoteList = new EmoteListWidget(this.field_230706_i_, (int) (this.field_230708_k_ / 2.2 - 16), this.field_230709_l_, this);
-        this.emoteList.setLeftPos(this.field_230708_k_/2-(int)(this.field_230708_k_/2.2-16)-12);
+        this.emoteList.func_230959_g_(this.field_230708_k_/2-(int)(this.field_230708_k_/2.2-16)-12);
         this.field_230705_e_.add(this.emoteList);
         int x = Math.min(this.field_230708_k_/4, (int)(this.field_230709_l_/2.5));
         this.fastMenu = new FastChooseWidget(this.field_230708_k_/2 + 2, this.field_230709_l_/2 - 8, x-7);
@@ -88,8 +83,8 @@ public class EmoteMenu extends Screen {
         setKeyButton = new Button(this.field_230708_k_/2 + 6, 60, 96, 20, unboundText, button -> this.activateKey());
         this.field_230710_m_.add(setKeyButton);
         resetKey =  new Button(this.field_230708_k_/2 + 124, 60, 96, 20, new TranslationTextComponent("controls.reset"), (button -> {
-            if(emoteList.getSelected() != null){
-                emoteList.getSelected().emote.keyBinding = InputMappings.INPUT_INVALID;
+            if(emoteList.func_230958_g_() != null){
+                emoteList.func_230958_g_().emote.keyBinding = InputMappings.INPUT_INVALID;
                 this.save = true;
             }
         }));
@@ -97,30 +92,34 @@ public class EmoteMenu extends Screen {
         emoteList.setEmotes(EmoteHolder.list);
         this.field_230705_e_.addAll(field_230710_m_);
         super.func_231160_c_();
-        this.setInitialFocus(this.searchBox);
+        this.setFocusedDefault(this.searchBox);
         this.texts.add(new PositionedText(new TranslationTextComponent("emotecraft.options.keybind"), this.field_230708_k_/2 +115, 40));
-        this.texts.add(new PositionedText(new TranslationTextComponent("emotecraft.options.fastmenu"), this.field_230708_k_/2 + 10 + x/2, height/2 - 54));
-        this.texts.add(new PositionedText(new TranslationTextComponent("emotecraft.options.fastmenu2"), this.field_230708_k_/2 + 10 + x/2, height/2 - 40));
-        this.texts.add(new PositionedText(new TranslationTextComponent("emotecraft.options.fastmenu3"), this.field_230708_k_/2 + 10 + x/2, height/2 - 26));
+        this.texts.add(new PositionedText(new TranslationTextComponent("emotecraft.options.fastmenu"), this.field_230708_k_/2 + 10 + x/2, field_230709_l_/2 - 54));
+        this.texts.add(new PositionedText(new TranslationTextComponent("emotecraft.options.fastmenu2"), this.field_230708_k_/2 + 10 + x/2, field_230709_l_/2 - 40));
+        this.texts.add(new PositionedText(new TranslationTextComponent("emotecraft.options.fastmenu3"), this.field_230708_k_/2 + 10 + x/2, field_230709_l_/2 - 26));
     }
 
     private void activateKey(){
-        if(emoteList.getSelected() != null) {
-            this.setFocused(setKeyButton);
+        if(emoteList.func_230958_g_() != null) {
+            this.func_231035_a_(setKeyButton);
             activeKeyTime = 200;
         }
     }
 
+    /**
+     * setFocused
+     * @param focused
+     */
     @Override
-    public void setFocused(@Nullable Element focused) {
-        if(activeKeyTime == 0) super.setFocused(focused);
+    public void func_231035_a_(@Nullable IGuiEventListener focused) {
+        if(activeKeyTime == 0) super.func_231035_a_(focused);
     }
 
     @Override
     public void func_231023_e_() {
         super.func_231023_e_();
         if(activeKeyTime == 1){
-            setFocused(null);
+            func_231035_a_(null);
         }
         if(activeKeyTime != 0){
             activeKeyTime--;
@@ -129,39 +128,46 @@ public class EmoteMenu extends Screen {
 
     @Override
     public boolean func_231044_a_(double mouseX, double mouseY, int button) {
-        if(this.activeKeyTime != 0 && emoteList.getSelected() != null){
+        if(this.activeKeyTime != 0 && emoteList.func_230958_g_() != null){
             return setKey(InputMappings.Type.MOUSE.getOrMakeInput(button));
         }
         else return super.func_231044_a_(mouseX, mouseY, button);
     }
 
 
+    /**
+     * render
+     * @param matrices
+     * @param mouseX
+     * @param mouseY
+     * @param delta
+     */
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void func_230430_a_(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         this.func_231165_f_(0);
-        if(this.emoteList.getSelected() == null){
-            this.setKeyButton.active = false;
-            this.resetKey.active = false;
+        if(this.emoteList.func_230958_g_() == null){
+            this.setKeyButton.field_230693_o_ = false;
+            this.resetKey.field_230693_o_ = false;
         }
         else {
-            this.setKeyButton.active = true;
-            this.resetKey.active = !this.emoteList.getSelected().emote.keyBinding.equals(InputMappings.INPUT_INVALID);
+            this.setKeyButton.field_230693_o_ = true;
+            this.resetKey.field_230693_o_ = !this.emoteList.func_230958_g_().emote.keyBinding.equals(InputMappings.INPUT_INVALID);
         }
         for(PositionedText str:texts){
             str.render(matrices, field_230712_o_);
         }
-        this.emoteList.render(matrices, mouseX, mouseY, delta);
-        this.searchBox.render(matrices, mouseX, mouseY, delta);
-        this.fastMenu.render(matrices, mouseX, mouseY, delta);
+        this.emoteList.func_230430_a_(matrices, mouseX, mouseY, delta);
+        this.searchBox.func_230430_a_(matrices, mouseX, mouseY, delta);
+        this.fastMenu.func_230430_a_(matrices, mouseX, mouseY, delta);
         updateKeyText();
-        super.render(matrices, mouseX, mouseY, delta);
+        super.func_230430_a_(matrices, mouseX, mouseY, delta);
     }
     private boolean setKey(InputMappings.Input key){
         boolean bl = false;
-        if(emoteList.getSelected()!= null){
+        if(emoteList.func_230958_g_()!= null){
             bl = true;
-            if(!applyKey(false, emoteList.getSelected().emote, key)){
-                this.field_230706_i_.displayGuiScreen(new ConfirmScreen((bool)-> confirmReturn(bool, emoteList.getSelected().emote, key), new TranslationTextComponent("emotecraft.sure"), new TranslationTextComponent("emotecraft.sure2")));
+            if(!applyKey(false, emoteList.func_230958_g_().emote, key)){
+                this.field_230706_i_.displayGuiScreen(new ConfirmScreen((bool)-> confirmReturn(bool, emoteList.func_230958_g_().emote, key), new TranslationTextComponent("emotecraft.sure"), new TranslationTextComponent("emotecraft.sure2")));
             }
         }
         return bl;
@@ -218,21 +224,21 @@ public class EmoteMenu extends Screen {
     }
 
     private void updateKeyText(){
-        if(emoteList.getSelected() != null){
-            ITextComponent message = emoteList.getSelected().emote.keyBinding.getLocalizedText();
+        if(emoteList.func_230958_g_() != null){
+            ITextComponent message = emoteList.func_230958_g_().emote.keyBinding.func_237520_d_();
             if(activeKeyTime != 0)message = (new StringTextComponent("> ")).func_230529_a_(message.func_230532_e_().func_240699_a_(TextFormatting.YELLOW)).func_240702_b_(" <").func_240699_a_(TextFormatting.YELLOW);
-            setKeyButton.setMessage(message);
+            setKeyButton.func_238482_a_(message);
         }
     }
 
     @Override
     public boolean func_231046_a_(int keyCode, int scanCode, int mod) {
-        if(emoteList.getSelected() != null && activeKeyTime != 0){
+        if(emoteList.func_230958_g_() != null && activeKeyTime != 0){
             if(keyCode == 256){
                 return setKey(InputMappings.INPUT_INVALID);
             }
             else {
-                return setKey(InputMappings.fromKeyCode(keyCode, scanCode));
+                return setKey(InputMappings.getInputByCode(keyCode, scanCode));
             }
         }
         else {
@@ -250,7 +256,7 @@ public class EmoteMenu extends Screen {
         @Override
         public void setEmotes(List<EmoteHolder> list) {
             for(EmoteHolder emote : list){
-                this.emotes.add(new EmoteListEntry(this.client, emote));
+                this.emotes.add(new EmoteListEntry(this.field_230668_b_, emote));
             }
             filter(() -> "");
         }
@@ -261,7 +267,7 @@ public class EmoteMenu extends Screen {
             }
 
             protected void onPressed() {        //setup screen -> select pack, play screen -> play
-                EmoteListWidget.this.setSelected(this);
+                EmoteListWidget.this.func_241215_a_(this);
             }
         }
     }
@@ -285,8 +291,8 @@ public class EmoteMenu extends Screen {
                 save = true;
                 return true;
             }
-            else if (emoteList.getSelected() != null){
-                element.setEmote(emoteList.getSelected().emote);
+            else if (emoteList.func_230958_g_() != null){
+                element.setEmote(emoteList.func_230958_g_().emote);
                 save = true;
                 return true;
             }
@@ -311,7 +317,7 @@ public class EmoteMenu extends Screen {
             this.y = y;
         }
         private void render(MatrixStack matrixStack, FontRenderer textRenderer){
-            drawCenteredText(matrixStack, textRenderer, this.str, this.x, this.y, Helper.colorHelper(255,255,255,255));
+            func_238472_a_(matrixStack, textRenderer, this.str, this.x, this.y, Helper.colorHelper(255,255,255,255));
             textRenderer.getClass();
         }
     }

@@ -16,10 +16,12 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.TranslatableText;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.glfw.GLFW;
 
@@ -30,14 +32,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-public class Client implements ClientModInitializer {
+public class Client {
 
     private static KeyBinding emoteKeyBinding;
     private static KeyBinding debugEmote;
     private static KeyBinding stopEmote;
-    public static final File externalEmotes = FabricLoader.getInstance().getGameDir().resolve("emotes").toFile();
-    @Override
-    public void onInitializeClient() {
+    public static final File externalEmotes = FMLPaths.GAMEDIR.get().resolve("emotes").toFile();
+    public static void onInitializeClient() {
         //There is the only client stuff
         //like get emote list, or add emote player key
         //EmoteSerializer.initilaizeDeserializer();
@@ -52,7 +53,7 @@ public class Client implements ClientModInitializer {
 
     }
 
-    private void initNetworkClient(){
+    private static void initNetworkClient(){
         ClientSidePacketRegistry.INSTANCE.register(Main.EMOTE_PLAY_NETWORK_PACKET_ID, ((packetContext, packetByteBuf) -> {
             EmotePacket emotePacket;
             Emote emote;

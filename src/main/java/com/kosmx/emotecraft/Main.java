@@ -14,6 +14,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +28,7 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 
-public class Main implements ModInitializer {
+public class Main {
 
     public static Logger LOGGER = LogManager.getLogger();
 
@@ -33,20 +36,19 @@ public class Main implements ModInitializer {
 
     public static final String MOD_ID = "emotecraft";
     public static final String MOD_NAME = "Emotecraft";
-    public static final Path CONFIGPATH = FabricLoader.getInstance().getConfigDir().resolve("emotecraft.json");
+    public static final Path CONFIGPATH = FMLPaths.CONFIGDIR.get().resolve("emotecraft.json");
 
     public static SerializableConfig config;
 
-    public static final Identifier EMOTE_PLAY_NETWORK_PACKET_ID = new Identifier(MOD_ID, "playemote");
-    public static final Identifier EMOTE_STOP_NETWORK_PACKET_ID = new Identifier(MOD_ID, "stopemote");
+    public static final ResourceLocation EMOTE_PLAY_NETWORK_PACKET_ID = new ResourceLocation(MOD_ID, "playemote");
+    public static final ResourceLocation EMOTE_STOP_NETWORK_PACKET_ID = new ResourceLocation(MOD_ID, "stopemote");
 
     /**
      * This initializer runs on the server and on the client.
      * Load config, init networking
      * And Main has the static variables of the mod.
      */
-    @Override
-    public void onInitialize() {
+    public static void onInitialize() {
 
         Serializer.initializeSerializer();/*
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT){ //I can't do it in the client initializer because I need it to serialize the config
@@ -69,7 +71,7 @@ public class Main implements ModInitializer {
         if (force || (config != null && config.showDebug)) LOGGER.log(level, "["+MOD_NAME+"] " + message);
     }
 
-    private void initServerNetwork(){
+    private static void initServerNetwork(){
         ServerSidePacketRegistry.INSTANCE.register(EMOTE_PLAY_NETWORK_PACKET_ID, ((packetContext, packetByteBuf) -> {EmotePacket packet = new EmotePacket();
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             if(!packet.read(packetByteBuf, config.validateEmote)) {
