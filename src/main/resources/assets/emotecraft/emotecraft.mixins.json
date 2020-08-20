@@ -2,6 +2,7 @@
   "required": true,
   "package": "com.kosmx.emotecraft.mixin",
   "compatibilityLevel": "JAVA_8",
+  "refmap": "emotecraft.refmap.json",
   "mixins": [],
   "client": [
     "EmotePlayerMixin",

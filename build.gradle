@@ -47,7 +47,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                emotecraft {
                     source sourceSets.main
                 }
             }
@@ -63,7 +63,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                emotecraft {
                     source sourceSets.main
                 }
             }
@@ -81,7 +81,7 @@ minecraft {
             args '--mod', 'emotecraft', '--all', '--output', file('src/generated/resources/')
 
             mods {
-                examplemod {
+                emotecraft {
                     source sourceSets.main
                 }
             }
@@ -125,8 +125,8 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "examplemod",
-            "Specification-Vendor": "examplemodsareus",
+            "Specification-Title": "Emotecraft",
+            "Specification-Vendor": "",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",

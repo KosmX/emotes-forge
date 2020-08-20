@@ -53,7 +53,7 @@ public abstract class EmotePlayerMixin extends PlayerEntity implements EmotePlay
     public void tick() {
         super.tick();
         if(Emote.isRunningEmote(this.emote)){
-            this.rotationYaw = (this.rotationYaw * 3 + this.cameraYaw)/4; //to set the body to the correct direction smooth.
+            this.renderYawOffset = (this.renderYawOffset * 3 + this.rotationYaw)/4; //to set the body to the correct direction smooth.
             if(this != Minecraft.getInstance().getRenderViewEntity() && Minecraft.getInstance().getRenderViewEntity() instanceof ClientPlayerEntity || EmoteHolder.canRunEmote(this)) {
                 this.emote.tick();
                 this.lastUpdated++;
