@@ -4,6 +4,7 @@ import com.kosmx.emotecraft.Emote;
 import com.kosmx.emotecraft.Main;
 import com.kosmx.emotecraft.config.EmoteHolder;
 import com.kosmx.emotecraft.network.EmotePacket;
+import com.kosmx.emotecraft.network.ForgeNetwork;
 import com.kosmx.emotecraft.network.StopPacket;
 import com.kosmx.emotecraft.playerInterface.EmotePlayerInterface;
 import com.mojang.authlib.GameProfile;
@@ -58,11 +59,12 @@ public abstract class EmotePlayerMixin extends PlayerEntity implements EmotePlay
                 this.lastUpdated++;
                 if(this == Minecraft.getInstance().getRenderViewEntity() && Minecraft.getInstance().getRenderViewEntity() instanceof ClientPlayerEntity && lastUpdated >= 100){
                     if(emote.getStopTick() - emote.getCurrentTick() < 50 && !emote.isInfinite())return;
-                    PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
+                    //PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
                     EmotePacket emotePacket = new EmotePacket(emote, this);
                     emotePacket.isRepeat = true;
-                    emotePacket.write(buf);
-                    ClientSidePacketRegistry.INSTANCE.sendToServer(Main.EMOTE_PLAY_NETWORK_PACKET_ID, buf);
+                    //emotePacket.write(buf);
+                    //ClientSidePacketRegistry.INSTANCE.sendToServer(Main.EMOTE_PLAY_NETWORK_PACKET_ID, buf);
+                    ForgeNetwork.emotePacket.sendToServer(emotePacket);
                     lastUpdated = 0;
                 }
                 else if((this != Minecraft.getInstance().getRenderViewEntity() || Minecraft.getInstance().getRenderViewEntity() instanceof RemoteClientPlayerEntity) && lastUpdated > 300){
@@ -71,10 +73,14 @@ public abstract class EmotePlayerMixin extends PlayerEntity implements EmotePlay
             }
             else {
                 emote.stop();
+                /*
                 PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
                 StopPacket packet = new StopPacket(this);
                 packet.write(buf);
                 ClientSidePacketRegistry.INSTANCE.sendToServer(Main.EMOTE_STOP_NETWORK_PACKET_ID, buf);
+
+                 */
+                ForgeNetwork.stopPacket.sendToServer(new StopPacket(this));
             }
         }
     }

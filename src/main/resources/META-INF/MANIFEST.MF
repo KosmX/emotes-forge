@@ -1,1 +1,1 @@
-MixinConnector: com.kosmx.emotecraft.MyMixinConnector
+MixinConnector: com.kosmx.emotecraft.MixinConnector

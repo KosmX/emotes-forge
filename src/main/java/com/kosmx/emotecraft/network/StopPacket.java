@@ -10,6 +10,10 @@ public class StopPacket {
 
     public StopPacket(){}
 
+    public StopPacket(PacketBuffer buffer){
+        this.read(buffer);
+    }
+
     public StopPacket(PlayerEntity playerEntity){
         this.player = playerEntity.getGameProfile().getId();
     }

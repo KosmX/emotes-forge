@@ -3,24 +3,23 @@ package com.kosmx.emotecraft;
 import com.kosmx.emotecraft.config.EmoteHolder;
 import com.kosmx.emotecraft.config.Serializer;
 import com.kosmx.emotecraft.network.EmotePacket;
+import com.kosmx.emotecraft.network.ForgeNetwork;
 import com.kosmx.emotecraft.network.StopPacket;
 import com.kosmx.emotecraft.playerInterface.EmotePlayerInterface;
 import com.kosmx.emotecraft.gui.ingame.FastMenuScreen;
 import com.kosmx.quarktool.QuarkReader;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.glfw.GLFW;
@@ -35,7 +34,7 @@ import java.util.Objects;
 public class Client {
 
     private static KeyBinding emoteKeyBinding;
-    private static KeyBinding debugEmote;
+    private static KeyBinding debugEmote = null;
     private static KeyBinding stopEmote;
     public static final File externalEmotes = FMLPaths.GAMEDIR.get().resolve("emotes").toFile();
     public static void onInitializeClient() {
@@ -46,14 +45,15 @@ public class Client {
 
         initKeyBindings();      //Init keyBinding, including debug key
 
-        initNetworkClient();        //Init the Client-ide network manager. The Main will have a server-side
+        //initNetworkClient();        //Init the Client-ide network manager. The Main will have a server-side
+        ForgeNetwork.initClientNet();
 
         initEmotes();       //Import the emotes, including both the default and the external.
 
 
     }
 
-    private static void initNetworkClient(){
+    /*private static void initNetworkClient(){
         ClientSidePacketRegistry.INSTANCE.register(Main.EMOTE_PLAY_NETWORK_PACKET_ID, ((packetContext, packetByteBuf) -> {
             EmotePacket emotePacket;
             Emote emote;
@@ -63,7 +63,7 @@ public class Client {
             emote = emotePacket.getEmote();
             boolean isRepeat = emotePacket.isRepeat;
             packetContext.getTaskQueue().execute(() ->{
-                PlayerEntity playerEntity = MinecraftClient.getInstance().world.getPlayerByUuid(emotePacket.getPlayer());
+                PlayerEntity playerEntity = Minecraft.getInstance().world.getPlayerByUuid(emotePacket.getPlayer());
                 if(playerEntity != null) {
                     if(!isRepeat || !Emote.isRunningEmote(((EmotePlayerInterface) playerEntity).getEmote())) {
                         ((EmotePlayerInterface) playerEntity).playEmote(emote);
@@ -81,11 +81,13 @@ public class Client {
             packet.read(packetByyeBuf);
 
             packetContex.getTaskQueue().execute(()-> {
-                EmotePlayerInterface player = (EmotePlayerInterface) MinecraftClient.getInstance().world.getPlayerByUuid(packet.getPlayer());
+                EmotePlayerInterface player = (EmotePlayerInterface) Minecraft.getInstance().world.getPlayerByUuid(packet.getPlayer());
                 if(player != null && Emote.isRunningEmote(player.getEmote()))player.getEmote().stop();
             });
         }));
     }
+
+     */
 
     public static void initEmotes(){
         //Serialize emotes
@@ -162,13 +164,13 @@ public class Client {
 
     private static void playDebugEmote(){
         Main.log(Level.INFO, "Playing debug emote");
-        Path location = FabricLoader.getInstance().getGameDir().resolve("emote.json");
+        Path location = FMLPaths.GAMEDIR.get().resolve("emote.json");
         try {
             BufferedReader reader = Files.newBufferedReader(location);
             EmoteHolder emoteHolder = EmoteHolder.deserializeJson(reader);
             reader.close();
-            if(MinecraftClient.getInstance().getCameraEntity() instanceof ClientPlayerEntity){
-                PlayerEntity entity = (PlayerEntity) MinecraftClient.getInstance().getCameraEntity();
+            if(Minecraft.getInstance().getRenderViewEntity() instanceof ClientPlayerEntity){
+                PlayerEntity entity = (PlayerEntity) Minecraft.getInstance().getRenderViewEntity();
                 emoteHolder.playEmote(entity);
             }
         }
@@ -180,51 +182,71 @@ public class Client {
     }
 
 
-    private void initKeyBindings(){
+    private static void initKeyBindings(){
         emoteKeyBinding = new KeyBinding(
                 "key.emotecraft.fastchoose",
-                InputUtil.Type.KEYSYM,
+                InputMappings.Type.KEYSYM,
                 GLFW.GLFW_KEY_B,        //because bedrock edition has the same key
                 "category.emotecraft.keybinding"
         );
-        if(FabricLoader.getInstance().getGameDir().resolve("emote.json").toFile().isFile()) { //Secret feature//
+        if(FMLPaths.GAMEDIR.get().resolve("emote.json").toFile().isFile()) { //Secret feature//
             debugEmote = new KeyBinding(
                     "key.emotecraft.debug",
-                    InputUtil.Type.KEYSYM,
+                    InputMappings.Type.KEYSYM,
                     GLFW.GLFW_KEY_O,       //I don't know why... just
                     "category.emotecraft.keybinding"
             );
-            KeyBindingHelper.registerKeyBinding(debugEmote);
-            ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
-                if (debugEmote.wasPressed()){
-                    playDebugEmote();
-                }
-            });
+            ClientRegistry.registerKeyBinding(debugEmote);
+            //ClientTickEvents.END_CLIENT_TICK.register(Minecraft -> {
+            //    if (debugEmote.wasPressed()){
+            //        playDebugEmote();
+            //    }
+            //});
         }
-        KeyBindingHelper.registerKeyBinding(emoteKeyBinding);
-
-        ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
+        ClientRegistry.registerKeyBinding(emoteKeyBinding);
+        /*
+        ClientTickEvents.END_CLIENT_TICK.register(Minecraft -> {
             if (emoteKeyBinding.wasPressed()){
-                if(MinecraftClient.getInstance().getCameraEntity() instanceof ClientPlayerEntity){
-                    MinecraftClient.getInstance().openScreen(new FastMenuScreen(new TranslatableText("emotecraft.fastmenu")));
+                if(Minecraft.getInstance().getCameraEntity() instanceof ClientPlayerEntity){
+                    Minecraft.getInstance().openScreen(new FastMenuScreen(new TranslatableText("emotecraft.fastmenu")));
                 }
             }
         });
 
-        stopEmote = new KeyBinding("key.emotecraft.stop", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "category.emotecraft.keybinding");
-        KeyBindingHelper.registerKeyBinding(stopEmote);
+         */
 
-        ClientTickEvents.END_CLIENT_TICK.register(minecraftClient -> {
-            if(stopEmote.wasPressed() && MinecraftClient.getInstance().getCameraEntity() instanceof ClientPlayerEntity && Emote.isRunningEmote(((EmotePlayerInterface)MinecraftClient.getInstance().getCameraEntity()).getEmote())){
-                ((EmotePlayerInterface)MinecraftClient.getInstance().getCameraEntity()).getEmote().stop();
+        stopEmote = new KeyBinding("key.emotecraft.stop", InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "category.emotecraft.keybinding");
+        ClientRegistry.registerKeyBinding(stopEmote);
+        /*
+        ClientTickEvents.END_CLIENT_TICK.register(Minecraft -> {
+            if(stopEmote.wasPressed() && Minecraft.getInstance().getCameraEntity() instanceof ClientPlayerEntity && Emote.isRunningEmote(((EmotePlayerInterface)Minecraft.getInstance().getCameraEntity()).getEmote())){
+                ((EmotePlayerInterface)Minecraft.getInstance().getCameraEntity()).getEmote().stop();
                 PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-                StopPacket packet = new StopPacket((PlayerEntity) MinecraftClient.getInstance().getCameraEntity());
+                StopPacket packet = new StopPacket((PlayerEntity) Minecraft.getInstance().getCameraEntity());
                 packet.write(buf);
                 ClientSidePacketRegistry.INSTANCE.sendToServer(Main.EMOTE_STOP_NETWORK_PACKET_ID, buf);
             }
         });
 
-        KeyPressCallback.EVENT.register((EmoteHolder::playEmote));
+         */
 
+        //KeyPressCallback.EVENT.register((EmoteHolder::playEmote));
+
+        MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
+    }
+    private static class KeyInputHandler{
+        @SubscribeEvent
+        public void onKeyInput(InputEvent.KeyInputEvent event){
+            if(debugEmote != null && debugEmote.isPressed())playDebugEmote();
+            if (emoteKeyBinding.isPressed()){
+                if(Minecraft.getInstance().getRenderViewEntity() instanceof ClientPlayerEntity){
+                    Minecraft.getInstance().displayGuiScreen(new FastMenuScreen(new TranslationTextComponent("emotecraft.fastmenu")));
+                }
+            }
+            if(stopEmote.isPressed() && Minecraft.getInstance().getRenderViewEntity() instanceof ClientPlayerEntity && Emote.isRunningEmote(((EmotePlayerInterface)Minecraft.getInstance().getRenderViewEntity()).getEmote())){
+                ((EmotePlayerInterface)Minecraft.getInstance().getRenderViewEntity()).getEmote().stop();
+                ForgeNetwork.stopPacket.sendToServer(new StopPacket(Minecraft.getInstance().player));
+            }
+        }
     }
 }

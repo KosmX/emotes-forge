@@ -5,6 +5,7 @@ import com.kosmx.emotecraft.Client;
 import com.kosmx.emotecraft.Emote;
 import com.kosmx.emotecraft.Main;
 import com.kosmx.emotecraft.network.EmotePacket;
+import com.kosmx.emotecraft.network.ForgeNetwork;
 import com.kosmx.emotecraft.playerInterface.EmotePlayerInterface;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -184,10 +185,7 @@ public class EmoteHolder {
     public static boolean playEmote(Emote emote, PlayerEntity player){
         if(canPlayEmote(player)) {
             try {
-                PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
-                EmotePacket emotePacket = new EmotePacket(emote, player);
-                emotePacket.write(buf);
-                ClientSidePacketRegistry.INSTANCE.sendToServer(Main.EMOTE_PLAY_NETWORK_PACKET_ID, buf);//TODO
+                ForgeNetwork.emotePacket.sendToServer(new EmotePacket(emote, player));
                 EmotePlayerInterface target = (EmotePlayerInterface) player;
                 target.playEmote(emote);
                 emote.start();

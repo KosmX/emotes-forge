@@ -3,17 +3,7 @@ package com.kosmx.emotecraft;
 import com.google.gson.JsonParseException;
 import com.kosmx.emotecraft.config.SerializableConfig;
 import com.kosmx.emotecraft.config.Serializer;
-import com.kosmx.emotecraft.network.EmotePacket;
-import com.kosmx.emotecraft.network.StopPacket;
-import io.netty.buffer.Unpooled;
-import net.fabricmc.api.ModInitializer;
-
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-import net.fabricmc.fabric.api.server.PlayerStream;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import com.kosmx.emotecraft.network.ForgeNetwork;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -60,7 +50,8 @@ public class Main {
 
         log(Level.INFO, "Initializing");
 
-        initServerNetwork(); //Network handler both dedicated server and client internal server
+        //initServerNetwork(); //Network handler both dedicated server and client internal server
+        ForgeNetwork.initNetwork();
     }
 
     public static void log(Level level, String message){
@@ -71,7 +62,7 @@ public class Main {
         if (force || (config != null && config.showDebug)) LOGGER.log(level, "["+MOD_NAME+"] " + message);
     }
 
-    private static void initServerNetwork(){
+    /*private static void initServerNetwork(){
         ServerSidePacketRegistry.INSTANCE.register(EMOTE_PLAY_NETWORK_PACKET_ID, ((packetContext, packetByteBuf) -> {EmotePacket packet = new EmotePacket();
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
             if(!packet.read(packetByteBuf, config.validateEmote)) {
@@ -100,6 +91,8 @@ public class Main {
             });
         }));
     }
+
+     */
 
     private static void loadConfig(){
         if(CONFIGPATH.toFile().isFile()){
