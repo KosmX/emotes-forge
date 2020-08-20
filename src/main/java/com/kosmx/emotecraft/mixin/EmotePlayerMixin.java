@@ -64,7 +64,7 @@ public abstract class EmotePlayerMixin extends PlayerEntity implements EmotePlay
                     emotePacket.isRepeat = true;
                     //emotePacket.write(buf);
                     //ClientSidePacketRegistry.INSTANCE.sendToServer(Main.EMOTE_PLAY_NETWORK_PACKET_ID, buf);
-                    ForgeNetwork.emotePacket.sendToServer(emotePacket);
+                    ForgeNetwork.emotePacketc2s.sendToServer(emotePacket);
                     lastUpdated = 0;
                 }
                 else if((this != Minecraft.getInstance().getRenderViewEntity() || Minecraft.getInstance().getRenderViewEntity() instanceof RemoteClientPlayerEntity) && lastUpdated > 300){
@@ -80,7 +80,7 @@ public abstract class EmotePlayerMixin extends PlayerEntity implements EmotePlay
                 ClientSidePacketRegistry.INSTANCE.sendToServer(Main.EMOTE_STOP_NETWORK_PACKET_ID, buf);
 
                  */
-                ForgeNetwork.stopPacket.sendToServer(new StopPacket(this));
+                ForgeNetwork.stopPacketc2s.sendToServer(new StopPacket(this));
             }
         }
     }

@@ -2,23 +2,23 @@ package com.kosmx.emotecraft;
 
 import com.kosmx.emotecraft.config.EmoteHolder;
 import com.kosmx.emotecraft.config.Serializer;
-import com.kosmx.emotecraft.network.EmotePacket;
+import com.kosmx.emotecraft.gui.EmoteMenu;
 import com.kosmx.emotecraft.network.ForgeNetwork;
 import com.kosmx.emotecraft.network.StopPacket;
 import com.kosmx.emotecraft.playerInterface.EmotePlayerInterface;
 import com.kosmx.emotecraft.gui.ingame.FastMenuScreen;
 import com.kosmx.quarktool.QuarkReader;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.Level;
@@ -50,6 +50,7 @@ public class Client {
 
         initEmotes();       //Import the emotes, including both the default and the external.
 
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (client, parent) -> new EmoteMenu(parent));
 
     }
 
@@ -245,7 +246,7 @@ public class Client {
             }
             if(stopEmote.isPressed() && Minecraft.getInstance().getRenderViewEntity() instanceof ClientPlayerEntity && Emote.isRunningEmote(((EmotePlayerInterface)Minecraft.getInstance().getRenderViewEntity()).getEmote())){
                 ((EmotePlayerInterface)Minecraft.getInstance().getRenderViewEntity()).getEmote().stop();
-                ForgeNetwork.stopPacket.sendToServer(new StopPacket(Minecraft.getInstance().player));
+                ForgeNetwork.stopPacketc2s.sendToServer(new StopPacket(Minecraft.getInstance().player));
             }
         }
     }

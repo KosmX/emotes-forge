@@ -11,18 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SerializableConfig {
-    @OnlyIn(Dist.CLIENT)
+    //@OnlyIn(Dist.CLIENT)
     public List<EmoteHolder> emotesWithKey = new ArrayList<>();
-    @OnlyIn(Dist.CLIENT)
+    //@OnlyIn(Dist.CLIENT)
     public final EmoteHolder[] fastMenuEmotes = new EmoteHolder[8];
 
     public boolean validateEmote = false;
     public boolean showDebug = false;
-    @OnlyIn(Dist.CLIENT)
+    //@OnlyIn(Dist.CLIENT)
     public boolean dark = false;
-    @OnlyIn(Dist.CLIENT)
+    //@OnlyIn(Dist.CLIENT)
     public boolean enableQuark = false;
-    @OnlyIn(Dist.CLIENT)
+    //@OnlyIn(Dist.CLIENT)
     public boolean showIcons = true;
 
     public int[] fastMenuHash = new int[8];

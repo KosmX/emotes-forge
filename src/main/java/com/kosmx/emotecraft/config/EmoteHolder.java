@@ -185,7 +185,7 @@ public class EmoteHolder {
     public static boolean playEmote(Emote emote, PlayerEntity player){
         if(canPlayEmote(player)) {
             try {
-                ForgeNetwork.emotePacket.sendToServer(new EmotePacket(emote, player));
+                ForgeNetwork.emotePacketc2s.sendToServer(new EmotePacket(emote, player));
                 EmotePlayerInterface target = (EmotePlayerInterface) player;
                 target.playEmote(emote);
                 emote.start();

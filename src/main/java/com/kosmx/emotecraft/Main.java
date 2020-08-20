@@ -5,7 +5,6 @@ import com.kosmx.emotecraft.config.SerializableConfig;
 import com.kosmx.emotecraft.config.Serializer;
 import com.kosmx.emotecraft.network.ForgeNetwork;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 
 
 public class Main {
@@ -30,8 +28,10 @@ public class Main {
 
     public static SerializableConfig config;
 
-    public static final ResourceLocation EMOTE_PLAY_NETWORK_PACKET_ID = new ResourceLocation(MOD_ID, "playemote");
-    public static final ResourceLocation EMOTE_STOP_NETWORK_PACKET_ID = new ResourceLocation(MOD_ID, "stopemote");
+    public static final ResourceLocation EMOTE_PLAY_NETWORK_PACKET_IDS2C = new ResourceLocation(MOD_ID, "playemotes2c");
+    public static final ResourceLocation EMOTE_STOP_NETWORK_PACKET_IDS2C = new ResourceLocation(MOD_ID, "stopemotes2c");
+    public static final ResourceLocation EMOTE_PLAY_NETWORK_PACKET_IDC2S = new ResourceLocation(MOD_ID, "playemotec2s");
+    public static final ResourceLocation EMOTE_STOP_NETWORK_PACKET_IDC2S = new ResourceLocation(MOD_ID, "stopemotec2s");
 
     /**
      * This initializer runs on the server and on the client.
