@@ -50,7 +50,7 @@ public abstract class AbstractFastChooseWidget extends AbstractGui implements IR
 
     public static void drawCenteredText(MatrixStack matrices, FontRenderer textRenderer, ITextComponent stringRenderable, float x, float y){
         int c = Main.config.dark ? 255 : 0; //:D
-        textRenderer.func_243248_b(matrices, stringRenderable, x - (float)textRenderer.func_238414_a_(stringRenderable) / 2, y - 2, Helper.colorHelper(c, c, c, 1));
+        textRenderer.func_238422_b_(matrices, stringRenderable, x - (float)textRenderer.func_238414_a_(stringRenderable) / 2, y - 2, Helper.colorHelper(c, c, c, 1));
     }
 
     @Nullable

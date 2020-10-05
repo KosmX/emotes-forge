@@ -70,9 +70,9 @@ public abstract class AbstractEmoteListWidget<E extends AbstractEmoteListWidget.
                 RenderSystem.color4f(1, 1, 1, 1);
                 AbstractGui.func_238467_a_(matrices, x - 1, y - 1, x + entryWidth - 9, y + entryHeight + 1, Helper.colorHelper(66, 66, 66, 128));
             }
-            this.client.fontRenderer.func_243246_a(matrices, this.emote.name, x + 38, y + 1, 16777215);
-            this.client.fontRenderer.func_243246_a(matrices, this.emote.description, x + 38, y + 12, 8421504);
-            if(!this.emote.author.getString().equals(""))this.client.fontRenderer.func_243246_a(matrices, new TranslationTextComponent("emotecraft.emote.author").func_240699_a_(TextFormatting.GOLD).func_230529_a_(this.emote.author), x + 38, y + 23, 8421504);
+            this.client.fontRenderer.func_238407_a_(matrices, this.emote.name, x + 38, y + 1, 16777215);
+            this.client.fontRenderer.func_238407_a_(matrices, this.emote.description, x + 38, y + 12, 8421504);
+            if(!this.emote.author.getString().equals(""))this.client.fontRenderer.func_238407_a_(matrices, new TranslationTextComponent("emotecraft.emote.author").func_240699_a_(TextFormatting.GOLD).func_230529_a_(this.emote.author), x + 38, y + 23, 8421504);
             if(this.emote.getIcon() != null) {
                 RenderSystem.color4f(1, 1, 1, 1);
                 Minecraft.getInstance().getTextureManager().bindTexture(this.emote.getIcon());

@@ -29,9 +29,10 @@ public abstract class EmotePlayerMixin extends PlayerEntity implements EmotePlay
 
     private int lastUpdated;
 
-    public EmotePlayerMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
-        super(world, pos, yaw, profile);
+    public EmotePlayerMixin(World p_i231577_1_, BlockPos p_i231577_2_, GameProfile p_i231577_3_) {
+        super(p_i231577_1_, p_i231577_2_, p_i231577_3_);
     }
+
 
     @Override
     public void playEmote(Emote emote) {
