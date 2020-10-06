@@ -71,8 +71,8 @@ public class ForgeNetwork {
         });
         if(FMLEnvironment.dist == Dist.DEDICATED_SERVER){
             //To register the ids on the server-side if no client-side
-            emotePackets2c.registerMessage(8, EmotePacket.class, null, null, null);
-            stopPackets2c.registerMessage(9, EmotePacket.class, null, null, null);
+            emotePackets2c.registerMessage(8, EmotePacket.class, EmotePacket::write, EmotePacket::new, null);
+            stopPackets2c.registerMessage(9, StopPacket.class, StopPacket::write, StopPacket::new, null);
         }
     }
 

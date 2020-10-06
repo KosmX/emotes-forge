@@ -27,7 +27,7 @@ apply plugin: 'maven-publish'
 
 
 
-version = '0.12.3'
+version = '0.12.4'
 group = 'com.kosmx.emotecraft' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'emotecraft'
 
