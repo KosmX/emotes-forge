@@ -11,12 +11,21 @@ buildscript {
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
+plugins {
+    id 'maven-publish'
+    id 'maven'
+    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'java-library'
+    id 'net.corda.plugins.jar-filter' version "4.0.48" apply false
+    id "com.github.johnrengelman.shadow" version "4.0.4"
+}
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.12.3'
+version = '0.12.4'
 group = 'com.kosmx.emotecraft' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'emotecraft'
 
@@ -108,6 +117,7 @@ dependencies {
 
     // These dependencies get remapped to your current MCP mappings
     // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+    api(fg.deobf("me.shedaniel.cloth:cloth-config-forge:4.1.0"))
 
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
@@ -115,7 +125,7 @@ dependencies {
 
 
     //Mod dependencies
-    compile files("cloth-config-forge-4.1.0.jar")
+    //compile files("cloth-config-forge-4.1.0.jar")
 
     compile 'org.spongepowered:mixin:0.8.1-SNAPSHOT'
 
