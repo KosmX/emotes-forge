@@ -1,44 +1,43 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = "https://repo.spongepowered.org/maven" }
         jcenter()
         mavenCentral()
-        maven {url='https://dist.creeper.host/Sponge/maven'}
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
-plugins {
-    id 'maven-publish'
-    id 'maven'
-    id 'com.jfrog.bintray' version '1.8.4'
-    id 'com.matthewprenger.cursegradle' version '1.4.0'
-    id 'java-library'
-    id 'net.corda.plugins.jar-filter' version "4.0.48" apply false
-    id "com.github.johnrengelman.shadow" version "4.0.4"
+
+repositories {
+    maven{
+        name = "KosmX's maven"
+        url = "http://kosmx.ddns.net/maven"
+    }
 }
+        
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.12.4'
-group = 'com.kosmx.emotecraft' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+version = '2.0.1'
+group = 'io.github.kosmx.emotes'
 archivesBaseName = 'emotecraft'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   Snapshot are built nightly.
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200514-1.16'
+    //mappings channel: 'snapshot', version: '20171003-1.12'
+    mappings channel: 'snapshot', version: '20171003-1.12'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -54,46 +53,15 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
-
-            mods {
-                emotecraft {
-                    source sourceSets.main
-                }
-            }
         }
 
         server {
-            workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
-
-            mods {
-                emotecraft {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'emotecraft', '--all', '--output', file('src/generated/resources/')
-
-            mods {
-                emotecraft {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }
@@ -102,7 +70,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.7'
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -117,33 +85,50 @@ dependencies {
 
     // These dependencies get remapped to your current MCP mappings
     // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-    api(fg.deobf("me.shedaniel.cloth:cloth-config-forge:4.1.0"))
 
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+    implementation "io.github.kosmx.emotes:emotesMain:2.0.0"
 
-    //Mod dependencies
-    //compile files("cloth-config-forge-4.1.0.jar")
-
-    compile 'org.spongepowered:mixin:0.8.1-SNAPSHOT'
-
+    compile('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
+        exclude module: 'guava'
+        exclude module: 'commons-io'
+        exclude module: 'gson'
+    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+    from {
+        configurations.compile
+                .filter { "mixin-0.8.3-SNAPSHOT.jar" == it.name }
+                .collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
+    }
+
     manifest {
         attributes([
             "Specification-Title": "Emotecraft",
-            "Specification-Vendor": "",
+            "Specification-Vendor": "emotecraft",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"examplemodsareus",
+            "Implementation-Vendor" :"emotecraft",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConnector" : "com.kosmx.emotecraft.MixinConnector"
+            "FMLAT": "emotecraft_at.cfg" //some random AT
         ])
+        manifest {
+            attributes "FMLCorePlugin": "io.github.kosmx.emotes.forgeCore.CoreMod" //Mixin initializer :D
+            attributes "FMLCorePluginContainsFMLMod": "true"
+            attributes "ForceLoadAsMod": "true"
+            attributes "TweakClass": "org.spongepowered.asm.launch.MixinTweaker"
+            attributes "TweakOrder": "0"
+            attributes "MixinConfigs": "emotecraft.mixins.json"
+            attributes "MixinConfigs": "bendylib.mixin.json"
+        }
     }
 }
 
@@ -164,17 +149,4 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
     }
-}
-apply plugin: 'org.spongepowered.mixin'
-repositories {
-    maven { url = 'https://files.minecraftforge.net/maven' }
-    jcenter()
-    mavenCentral()
-
-    maven {url='https://dist.creeper.host/Sponge/maven'}
-
-}
-mixin {
-    add sourceSets.main, "emotecraft.refmap.json"
-    //add sourceSets.another, "another.refmap.json"
 }

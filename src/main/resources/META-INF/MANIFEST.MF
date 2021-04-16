@@ -1,1 +1,0 @@
-MixinConnector: com.kosmx.emotecraft.MixinConnector
