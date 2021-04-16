@@ -1,0 +1,16 @@
+[
+{
+  "modid": "emotecraft",
+  "name": "Emotecraft",
+  "description": "Some random mod description because this version is already outdated",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["KosmX"],
+  "credits": "Why do I have to implement this to 1.12.2",
+  "logoFile": "emotecraft_mod_logo.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
